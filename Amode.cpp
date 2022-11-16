@@ -43,6 +43,21 @@ int loadRFData(float **RFData, const char *fileName, int numElement, int numSamp
 float *genScanlineLocation(int &numPixel)
 {
 
+    float depth;
+    int numPixel;
+
+    cout << "Scanline Depth: ";
+    cin >> depth;
+
+    cout << "Number of Pixels: ";
+    cin >> numPixel;
+
+    float scanlineLocation[numPixel];
+    for (int i=0; i<numPixel; i++){
+        scanlineLocation[i] = i*(depth/(numPixel-1));
+    }
+
+    return scanlineLocation;
 }
 
 // Create an array containing the element location (in x-direction) of the ultrasound transducer
