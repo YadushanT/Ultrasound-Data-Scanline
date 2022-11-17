@@ -1,1 +1,1 @@
-# Ultrasound-Data-Model
+# A-mode Beamforming Ultrasound Data Modeling
