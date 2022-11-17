@@ -33,8 +33,9 @@ int loadRFData(float **RFData, const char *fileName, int numElement, int numSamp
     char lineArr[MAX_SIZE];
     int elementCount = 0;
     int sampleCount = 0;
+
     while (infile.getline(lineArr, MAX_SIZE)){
-        RFData[numElement][numSample] = atof(lineArr);
+        RFData[elementCount][sampleCount] = atof(lineArr);
         sampleCount++;
         if (sampleCount == numSample){
             elementCount++;
@@ -51,17 +52,17 @@ float *genScanlineLocation(int &numPixel)
 {
 
     float depth;
-    int numPixel;
+    int pixel;
 
     cout << "Scanline Depth: ";
     cin >> depth;
 
     cout << "Number of Pixels: ";
-    cin >> numPixel;
+    cin >> pixel;
 
-    float scanlineLocation[numPixel];
-    for (int i=0; i<numPixel; i++){
-        scanlineLocation[i] = i*(depth/(numPixel-1));
+    float scanlineLocation[pixel];
+    for (int i=0; i<pixel; i++){
+        scanlineLocation[i] = i*(depth/(pixel-1));
     }
 
     return scanlineLocation;
@@ -72,9 +73,9 @@ float *genElementLocation(int numElement, float PITCH)
 {
     float eleLocation[numElement];  
 
-    for (int n=0; n<numElement; n++){
+    for (int n=0; n<=numElement-1; n++){
         eleLocation[n] = (n-((numElement-1)/2)) * PITCH;
-        cout << eleLocation[n];
+        cout << n << ":" << eleLocation[n] << endl;
     }
 }
 
