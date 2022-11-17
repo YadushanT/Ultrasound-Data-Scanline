@@ -31,12 +31,19 @@ int loadRFData(float **RFData, const char *fileName, int numElement, int numSamp
     
     const int MAX_SIZE = 20;
     char lineArr[MAX_SIZE];
-    for (int i=0; i<numElement; i++) {
-        for (int j=0; j<numSample; j++) {
-            infile.getline(lineArr, MAX_SIZE);
-            RFData[i][j] = atof(lineArr);
+    int elementCount = 0;
+    int sampleCount = 0;
+    while (infile.getline(lineArr, MAX_SIZE)){
+        RFData[numElement][numSample] = atof(lineArr);
+        sampleCount++;
+        if (sampleCount == numSample){
+            elementCount++;
+            sampleCount = 0;
         }
-    }   
+        if (elementCount == numElement){
+            break;
+        }
+    }
 }
 
 // Create an array containing the depth location (in z-direction) for each pixel on the scanline
@@ -63,7 +70,12 @@ float *genScanlineLocation(int &numPixel)
 // Create an array containing the element location (in x-direction) of the ultrasound transducer
 float *genElementLocation(int numElement, float PITCH)
 {
-   
+    float eleLocation[numElement];  
+
+    for (int n=0; n<numElement; n++){
+        eleLocation[n] = (n-((numElement-1)/2)) * PITCH;
+        cout << eleLocation[n];
+    }
 }
 
 // Allocate memory to store the beamformed scanline
