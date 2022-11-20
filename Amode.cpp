@@ -103,31 +103,19 @@ void beamform(float *scanline, float **realRFData, float **imagRFData, float *sc
     float mag[numPixel];
 
     for (int i=0; i<numPixel; i++){
+        float sumReal = 0;
+        float sumImag = 0;
         tForward[i] = scanlinePosition[i]/SoS;
-    }
-
-    for (int i=0; i<numPixel; i++){
         for (int k=0; k<numElement; k++){
             tBackward[i][k] = (sqrt(pow(scanlinePosition[i], 2) + pow(elementPosition[i], 2)))/SoS;
             tTotal[i][k] = tForward[i] + tBackward[i][k];
             s[i][k] = floor(tTotal[i][k] * FS);
-            cout << s[i][k] << endl; //why is it not outputting array?
-        }
-    }
-
-    for (int i=0; i<= numPixel-1; i++){
-        float sumReal = 0;
-        float sumImag = 0;
-        for (int k=0; k<= numElement-1; k++){
             sumReal = sumReal + realRFData[k][s[i][k]];
             sumImag = sumImag + imagRFData[k][s[i][k]];
-
+            cout << s[i][k] << endl; //why is it not outputting array?
         }
         pReal[i] = sumReal;
         pImag[i] = sumImag;
-    }
-
-    for (int i=0; i<numPixel; i++){
         mag[i] = sqrt(pow(pReal[i], 2) + pow(pImag[i], 2));
         //cout << mag[i] << endl;
     }
@@ -151,5 +139,12 @@ int outputScanline(const char *fileName, float *scanlinePosition, float *scanlin
 // Destroy all the allocated memory
 void destroyAllArrays(float *scanline, float **realRFData, float **imagRFData, float *scanlinePosition, float *elementPosition, int numElement, int numSample, int numPixel)
 {
-    
+    delete[] scanline;
+    delete[] scanlinePosition;
+    delete[] elementPosition;
+
+    for (int i=0; i<numElement; i++){
+        delete[] realRFData[i];
+        delete[] imagRFData [i];
+    }
 }
