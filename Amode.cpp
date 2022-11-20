@@ -142,6 +142,9 @@ int outputScanline(const char *fileName, float *scanlinePosition, float *scanlin
         return -1;
     }
 
+    for (int i=0; i<numPixel; i++){
+        cout << scanlinePosition[i] << "," << scanline[i] << endl;
+    }
 
 }
 
