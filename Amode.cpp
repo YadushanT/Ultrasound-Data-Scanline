@@ -52,7 +52,7 @@ float *genScanlineLocation(int &numPixel)
 {
 
     float depth;
-    int pixel;
+    int  pixel;
 
     cout << "Scanline Depth: ";
     cin >> depth;
@@ -63,6 +63,7 @@ float *genScanlineLocation(int &numPixel)
     float scanlineLocation[pixel];
     for (int i=0; i<pixel; i++){
         scanlineLocation[i] = i*(depth/(pixel-1));
+        //cout << scanlineLocation[i] << endl;
     }
 
     return scanlineLocation;
@@ -77,12 +78,14 @@ float *genElementLocation(int numElement, float PITCH)
         eleLocation[n] = (n-((numElement-1)/2)) * PITCH;
         //cout << n << ":" << eleLocation[n] << endl;
     }
+
+    //return eleLocation;
 }
 
 // Allocate memory to store the beamformed scanline
 float *createScanline(int numPixel)
 {
-    float* scanline;
+    float *scanline;
     scanline = new float[numPixel];
     return scanline;
 }
@@ -90,10 +93,14 @@ float *createScanline(int numPixel)
 // Beamform the A-mode scanline
 void beamform(float *scanline, float **realRFData, float **imagRFData, float *scanlinePosition, float *elementPosition, int numElement, int numSample, int numPixel, float FS, float SoS)
 {
+
     float tForward[numPixel];
     float tBackward[numPixel][numElement];
     float tTotal[numPixel][numElement];
-    float s[numPixel][numElement];
+    int s[numPixel][numElement];
+    float pReal[numPixel];
+    float pImag[numPixel];
+    float mag[numPixel];
 
     for (int i=0; i<numPixel; i++){
         tForward[i] = scanlinePosition[i]/SoS;
@@ -102,27 +109,40 @@ void beamform(float *scanline, float **realRFData, float **imagRFData, float *sc
     for (int i=0; i<numPixel; i++){
         for (int k=0; k<numElement; k++){
             tBackward[i][k] = (sqrt(pow(scanlinePosition[i], 2) + pow(elementPosition[i], 2)))/SoS;
-        }
-    }
-
-    for (int i=0; i<numPixel; i++){
-        for (int k=0; k<numElement; k++){
             tTotal[i][k] = tForward[i] + tBackward[i][k];
+            s[i][k] = floor(tTotal[i][k] * FS);
+            cout << s[i][k] << endl; //why is it not outputting array?
         }
     }
 
-    for (int i=0; i<numPixel; i++){
-        for (int k=0; k<numElement; k++){
-            s[i][k] = floor(tTotal[i][k] * FS);
-            cout << s[i][k] << endl;
+    for (int i=0; i<= numPixel-1; i++){
+        float sumReal = 0;
+        float sumImag = 0;
+        for (int k=0; k<= numElement-1; k++){
+            sumReal = sumReal + realRFData[k][s[i][k]];
+            sumImag = sumImag + imagRFData[k][s[i][k]];
+
         }
+        pReal[i] = sumReal;
+        pImag[i] = sumImag;
+    }
+
+    for (int i=0; i<numPixel; i++){
+        mag[i] = sqrt(pow(pReal[i], 2) + pow(pImag[i], 2));
+        //cout << mag[i] << endl;
     }
 }
 
 // Write the scanline to a csv file
 int outputScanline(const char *fileName, float *scanlinePosition, float *scanline, int numPixel)
 {
-    
+    ofstream infile(fileName);
+
+    if (infile.fail()){
+        return -1;
+    }
+
+
 }
 
 // Destroy all the allocated memory
