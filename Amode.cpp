@@ -111,7 +111,6 @@ void beamform(float *scanline, float **realRFData, float **imagRFData, float *sc
         pReal[i] = sumReal;
         pImag[i] = sumImag;
         scanline[i] = sqrt(pow(pReal[i], 2) + pow(pImag[i], 2));
-        cout << i << ":" << scanline[i] << endl;
     }
 }
 
