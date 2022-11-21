@@ -88,26 +88,22 @@ float *createScanline(int numPixel)
 // Beamform the A-mode scanline
 void beamform(float *scanline, float **realRFData, float **imagRFData, float *scanlinePosition, float *elementPosition, int numElement, int numSample, int numPixel, float FS, float SoS)
 {
-    float **tTotal;
-    tTotal = new float*[numPixel];
-
-    int **s;
-    s = new int*[numPixel];
-
-    float *pReal;
-    pReal = new float[numPixel];
-    float *pImag;
-    pImag = new float[numPixel];
+    
+    float tForward[numPixel];
+    float tBackward[numPixel][numElement];
+    float tTotal[numPixel][numElement];
+    int s[numPixel][numElement];
+    float pReal[numPixel];
+    float pImag[numPixel];
 
     for (int i=0; i<numPixel; i++){
         float sumReal = 0;
         float sumImag = 0;
-
-        tTotal[i] = new float[numElement];
-        s[i] = new int[numElement];
+        tForward[i] = scanlinePosition[i]/SoS;
 
         for (int k=0; k<numElement; k++){
-            tTotal[i][k] = (scanlinePosition[i] + (sqrt(pow(scanlinePosition[i], 2) + pow(elementPosition[i], 2))))/SoS;
+            tBackward[i][k] = (sqrt(pow(scanlinePosition[i], 2) + pow(elementPosition[k], 2)))/SoS;
+            tTotal[i][k] = tForward[i] + tBackward[i][k];
             s[i][k] = floor(tTotal[i][k] * FS);
             sumReal = sumReal + realRFData[k][s[i][k]];
             sumImag = sumImag + imagRFData[k][s[i][k]];
@@ -122,7 +118,8 @@ void beamform(float *scanline, float **realRFData, float **imagRFData, float *sc
 // Write the scanline to a csv file
 int outputScanline(const char *fileName, float *scanlinePosition, float *scanline, int numPixel)
 {
-    ofstream outfile(fileName);
+    ofstream outfile;
+    outfile.open(fileName);
 
     if (outfile.fail()){
         return -1;
@@ -131,6 +128,7 @@ int outputScanline(const char *fileName, float *scanlinePosition, float *scanlin
     for (int i=0; i<numPixel; i++){
         outfile << scanlinePosition[i] << "," << scanline[i] << endl;
     }
+    outfile.close();
     return 0;
 }
 
