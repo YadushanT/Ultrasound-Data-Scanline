@@ -33,18 +33,6 @@ int loadRFData(float **RFData, const char *fileName, int numElement, int numSamp
     const int MAX_SIZE = 20;
     char lineArr[MAX_SIZE];
 
-    /*while (infile.getline(lineArr, MAX_SIZE)){
-        RFData[elementCount][sampleCount] = atof(lineArr);
-        sampleCount++;
-        if (sampleCount == numSample){
-            elementCount++;
-            sampleCount = 0;
-        }
-        if (elementCount == numElement){
-            break;
-        }
-    }*/
-
     for (int i=0; i<numElement; i++){
         for (int k=0; k<numSample; k++){
             infile.getline(lineArr, MAX_SIZE);
@@ -71,7 +59,6 @@ float *genScanlineLocation(int &numPixel)
     scanlineLocation = new float[numPixel];
     for (int i=0; i<numPixel; i++){
         scanlineLocation[i] = i*(depth/(numPixel-1));
-        //cout << scanlineLocation[i] << endl;
     }
 
     return scanlineLocation;
@@ -85,7 +72,6 @@ float *genElementLocation(int numElement, float PITCH)
 
     for (int n=0; n<=numElement-1; n++){
         eleLocation[n] = (n-((numElement-1)/2)) * PITCH;
-        //cout << n << ":" << eleLocation[n] << endl;
     }
 
     return eleLocation;
@@ -102,13 +88,6 @@ float *createScanline(int numPixel)
 // Beamform the A-mode scanline
 void beamform(float *scanline, float **realRFData, float **imagRFData, float *scanlinePosition, float *elementPosition, int numElement, int numSample, int numPixel, float FS, float SoS)
 {
-    /*
-    float **tForward;
-    tForward = new float*[numPixel];
-
-    float **tBackward;
-    tBackward = new float*[numPixel];
-    */
     float **tTotal;
     tTotal = new float*[numPixel];
 
@@ -123,18 +102,15 @@ void beamform(float *scanline, float **realRFData, float **imagRFData, float *sc
     for (int i=0; i<numPixel; i++){
         float sumReal = 0;
         float sumImag = 0;
-        //tBackward[i] = new float[numElement];
+
         tTotal[i] = new float[numElement];
         s[i] = new int[numElement];
 
-        //*tForward[i] = scanlinePosition[i]/SoS;
         for (int k=0; k<numElement; k++){
-            //tBackward[i][k] = (sqrt(pow(scanlinePosition[i], 2) + pow(elementPosition[i], 2)))/SoS;
             tTotal[i][k] = (scanlinePosition[i] + (sqrt(pow(scanlinePosition[i], 2) + pow(elementPosition[i], 2))))/SoS;
             s[i][k] = floor(tTotal[i][k] * FS);
             sumReal = sumReal + realRFData[k][s[i][k]];
             sumImag = sumImag + imagRFData[k][s[i][k]];
-            //cout << s[i][k] << endl; //why is it not outputting array?
         }
         pReal[i] = sumReal;
         pImag[i] = sumImag;
@@ -147,7 +123,6 @@ void beamform(float *scanline, float **realRFData, float **imagRFData, float *sc
 int outputScanline(const char *fileName, float *scanlinePosition, float *scanline, int numPixel)
 {
     ofstream outfile(fileName);
-    //outfile.open(fileName);
 
     if (outfile.fail()){
         return -1;
@@ -156,7 +131,6 @@ int outputScanline(const char *fileName, float *scanlinePosition, float *scanlin
     for (int i=0; i<numPixel; i++){
         outfile << scanlinePosition[i] << "," << scanline[i] << endl;
     }
-    //outfile.close();
     return 0;
 }
 
