@@ -32,10 +32,8 @@ int loadRFData(float **RFData, const char *fileName, int numElement, int numSamp
     
     const int MAX_SIZE = 20;
     char lineArr[MAX_SIZE];
-    int elementCount = 0;
-    int sampleCount = 0;
 
-    while (infile.getline(lineArr, MAX_SIZE)){
+    /*while (infile.getline(lineArr, MAX_SIZE)){
         RFData[elementCount][sampleCount] = atof(lineArr);
         sampleCount++;
         if (sampleCount == numSample){
@@ -44,6 +42,13 @@ int loadRFData(float **RFData, const char *fileName, int numElement, int numSamp
         }
         if (elementCount == numElement){
             break;
+        }
+    }*/
+
+    for (int i=0; i<numElement; i++){
+        for (int k=0; k<numSample; k++){
+            infile.getline(lineArr, MAX_SIZE);
+            RFData[i][k] = atof(lineArr);
         }
     }
     infile.close();
@@ -129,19 +134,20 @@ void beamform(float *scanline, float **realRFData, float **imagRFData, float *sc
             s[i][k] = floor(tTotal[i][k] * FS);
             sumReal = sumReal + realRFData[k][s[i][k]];
             sumImag = sumImag + imagRFData[k][s[i][k]];
-            cout << s[i][k] << endl; //why is it not outputting array?
+            //cout << s[i][k] << endl; //why is it not outputting array?
         }
         pReal[i] = sumReal;
         pImag[i] = sumImag;
         scanline[i] = sqrt(pow(pReal[i], 2) + pow(pImag[i], 2));
+        cout << i << ":" << scanline[i] << endl;
     }
 }
 
 // Write the scanline to a csv file
 int outputScanline(const char *fileName, float *scanlinePosition, float *scanline, int numPixel)
 {
-    ofstream outfile;
-    outfile.open(fileName);
+    ofstream outfile(fileName);
+    //outfile.open(fileName);
 
     if (outfile.fail()){
         return -1;
@@ -150,7 +156,7 @@ int outputScanline(const char *fileName, float *scanlinePosition, float *scanlin
     for (int i=0; i<numPixel; i++){
         outfile << scanlinePosition[i] << "," << scanline[i] << endl;
     }
-    outfile.close();
+    //outfile.close();
     return 0;
 }
 
